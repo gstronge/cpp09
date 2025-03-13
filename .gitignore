@@ -1,0 +1,11 @@
+# project specific
+*.o
+btc
+data.csv
+*.txt
+
+
+# OS and Editor
+*.DS_Store
+Thumbs.db
+.vscode/

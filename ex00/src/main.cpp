@@ -8,7 +8,10 @@ int main(int argc, char** argv)
 		return 1;
 	}
 	BitcoinExchange		btx(argv[1]);
-	btx.parse();
-	btx.printMap();
+	btx.parseDatabase();
+	btx.parseInput();
+
+
+	// btx.printMap();
 	return 0;
 }
