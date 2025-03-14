@@ -1,8 +1,39 @@
 #include "../incl/BitcoinExchange.hpp"
 
-BitcoinExchange::BitcoinExchange(const std::string inputFile) : _inputFile(inputFile) {}
+BitcoinExchange::BitcoinExchange(std::string inputFile) : _inputFile(inputFile) {}
+
+BitcoinExchange::BitcoinExchange(BitcoinExchange& other) {
+	this->_inputFile = other._inputFile;
+	this->_dataFile = other._dataFile;
+	this->_errorMsg = other._errorMsg;
+
+	auto iter = _dataMap.begin();
+	while (iter != _dataMap.end())
+	{
+		this->_dataMap[iter->first] = iter->second;
+		iter++;
+	}
+}
 
 BitcoinExchange::~BitcoinExchange() {}
+
+BitcoinExchange&	BitcoinExchange::operator=(BitcoinExchange& other) {
+	if (this != &other)
+	{
+		this->_inputFile = other._inputFile;
+		this->_dataFile = other._dataFile;
+		this->_errorMsg = other._errorMsg;
+	
+		this->_dataMap.clear();
+		auto iter = _dataMap.begin();
+		while (iter != _dataMap.end())
+		{
+			this->_dataMap[iter->first] = iter->second;
+			iter++;
+		}
+	}
+	return (*this);
+}
 
 void BitcoinExchange::parseDatabase() {
 	std::ifstream	file;
@@ -10,7 +41,7 @@ void BitcoinExchange::parseDatabase() {
 
 	if(!file.is_open())
 	{
-		std::cout << "Error: could not open file.\n";
+		std::cout << "Error: could not open data file.\n";
 		exit (EXIT_FAILURE);
 	}
 
@@ -36,7 +67,7 @@ void BitcoinExchange::parseInput() {
 
 	if(!file.is_open())
 	{
-		std::cout << "Error: could not open file.\n";
+		std::cout << "Error: could not open input file.\n";
 		exit (EXIT_FAILURE);
 	}
 
@@ -118,8 +149,8 @@ bool	BitcoinExchange::dateIsValid(const std::string dateStr) {
 	int		month = std::stoi(dateStr.substr(5, 2));
 	int		day = std::stoi(dateStr.substr(8, 2));
 
-	if (year < 2009 || month < 1 || month > 12 || day < 1)
-
+	if (month < 1 || month > 12 || day < 1 || year < 2009 || (year == 2009 && month == 1 && (day == 1 || day == 2)))
+		return (false);
 	switch (month) {
 		case 1: case 3: case 5: case 7: case 8: case 10: case 12:
 			if (day > 31)
@@ -130,9 +161,9 @@ bool	BitcoinExchange::dateIsValid(const std::string dateStr) {
 				return (false);
 			break;
 		case 2:
-			if ((year == 2012 || year == 2016 || year == 2020 || year == 2024) && month > 29)
+			if (day > 29)
 				return (false);
-			if (!(year == 2012 || year == 2016 || year == 2020 || year == 2024) && month > 28)
+			if (!(year == 2012 || year == 2016 || year == 2020 || year == 2024) && day > 28)
 				return (false);
 	}
 
